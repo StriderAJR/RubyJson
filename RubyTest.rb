@@ -114,6 +114,48 @@ test.anotherClass.hashObj = {1=>hashObj1, 2=>hashObj2, 3=>hashObj3}
 
 
 $jsonString = RubyAutopsist.Serialize(test)
+
+
+
+#module A
+#  class AClass < Serializable
+#    attr_accessor :val
+#  end
+#end
+#
+#a = A::AClass.new
+#a.val = 100500
+#
+#p a.val
+#p a.class.name
+#p a.__class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #$className = test.class
 #
 #print tracer.GetJson
@@ -129,115 +171,115 @@ $jsonString = RubyAutopsist.Serialize(test)
 
 #print RubyAutopsist.Deserialize($jsonNET)
 
-$jsonNET = %q{
-{
-        "anotherClass" : {
-                "__id" : "19",
-                "__className" : "AnotherClass",
-                "arrObj" : [
-                        {
-                                "__id" : "8e",
-
-                                "testVal" : "TestObj1 for Arrays",
-                                "__className" : "TestObject"
-                        },
-                        {
-                                "__id" : "07",
-
-                                "__className" : "TestObject",
-                                "testVal" : "TestObj2 for Arrays",
-                                "val2" : "Another val2"
-                        },
-                        {
-                                "__id" : "a4",
-
-                                "val3" : "obj3 val3",
-                                "__className" : "TestObject",
-                                "testVal" : "TestObj3 for Arrays",
-                                "val2" : "obj3 val2"
-                        }
-                ],
-                "arr" : ["This","is","array!"],
-                "arrArr": [
-                                    [
-                                      "a",
-                                      "b"
-                                    ],
-                                    [
-                                      1,
-                                      2
-                                    ]
-                ],
-                "hash" : {
-                        "__id" : "0d",
-                        "1" : "Regular hash"
-                },
-                "hashObj" : {
-                        "__id" : "a8",
-                        "1" : {
-                                "__id" : "d8",
-
-                                "__className" : "TestObject",
-                                "testVal" : 100500
-                        },
-                        "3" : {
-                                "__id" : "4d",
-
-                                "testVal" : "I must not be Lazy!!",
-                                "__className" : "TestObject"
-                        },
-                        "2" : {
-                                "__id" : "25",
-
-                                "testVal" : "Too Lazy",
-                                "__className" : "TestObject"
-                        }
-                },
-                "hashHash" : {
-                        "__id" : "10",
-                        "2" : "hash",
-                        "1" : {
-                                "__id" : "33",
-
-                                "b" : "comlicated",
-                                "a" : "Very"
-                        },
-                        "3" : {
-                                "__id" : "51",
-
-                                "a" : "of",
-                                "z" : "hashes"
-                        }
-                },
-                "hashArr" : {
-                        "__id" : "39",
-                        "3" : true,
-                        "1" : ["hash","of"],
-                        "2" : ["arrays"],
-                        "4" : false
-                },
-                "arrHash" : [
-                        {
-                                "__id" : "3e",
-
-                                "1" : "This",
-                                "2" : "is"
-                        },
-                        {
-                                "__id" : "65",
-
-                                "b" : "hashes",
-                                "a" : "array of"
-                        }
-                ]
-        }
-
-}
-}
+#$jsonNET = %q{
+#{
+#        "anotherClass" : {
+#                "__id" : "19",
+#                "__className" : "AnotherClass",
+#                "arrObj" : [
+#                        {
+#                                "__id" : "8e",
+#
+#                                "testVal" : "TestObj1 for Arrays",
+#                                "__className" : "TestObject"
+#                        },
+#                        {
+#                                "__id" : "07",
+#
+#                                "__className" : "TestObject",
+#                                "testVal" : "TestObj2 for Arrays",
+#                                "val2" : "Another val2"
+#                        },
+#                        {
+#                                "__id" : "a4",
+#
+#                                "val3" : "obj3 val3",
+#                                "__className" : "TestObject",
+#                                "testVal" : "TestObj3 for Arrays",
+#                                "val2" : "obj3 val2"
+#                        }
+#                ],
+#                "arr" : ["This","is","array!"],
+#                "arrArr": [
+#                                    [
+#                                      "a",
+#                                      "b"
+#                                    ],
+#                                    [
+#                                      1,
+#                                      2
+#                                    ]
+#                ],
+#                "hash" : {
+#                        "__id" : "0d",
+#                        "1" : "Regular hash"
+#                },
+#                "hashObj" : {
+#                        "__id" : "a8",
+#                        "1" : {
+#                                "__id" : "d8",
+#
+#                                "__className" : "TestObject",
+#                                "testVal" : 100500
+#                        },
+#                        "3" : {
+#                                "__id" : "4d",
+#
+#                                "testVal" : "I must not be Lazy!!",
+#                                "__className" : "TestObject"
+#                        },
+#                        "2" : {
+#                                "__id" : "25",
+#
+#                                "testVal" : "Too Lazy",
+#                                "__className" : "TestObject"
+#                        }
+#                },
+#                "hashHash" : {
+#                        "__id" : "10",
+#                        "2" : "hash",
+#                        "1" : {
+#                                "__id" : "33",
+#
+#                                "b" : "comlicated",
+#                                "a" : "Very"
+#                        },
+#                        "3" : {
+#                                "__id" : "51",
+#
+#                                "a" : "of",
+#                                "z" : "hashes"
+#                        }
+#                },
+#                "hashArr" : {
+#                        "__id" : "39",
+#                        "3" : true,
+#                        "1" : ["hash","of"],
+#                        "2" : ["arrays"],
+#                        "4" : false
+#                },
+#                "arrHash" : [
+#                        {
+#                                "__id" : "3e",
+#
+#                                "1" : "This",
+#                                "2" : "is"
+#                        },
+#                        {
+#                                "__id" : "65",
+#
+#                                "b" : "hashes",
+#                                "a" : "array of"
+#                        }
+#                ]
+#        }
+#
+#}
+#}
 
 #puts $jsonString
-puts
-puts RubyAutopsist.Deserialize($jsonString)
+#puts
+#puts RubyAutopsist.Deserialize($jsonString)
 
 #puts RubyAutopsist.Deserialize($jsonNET)
 
