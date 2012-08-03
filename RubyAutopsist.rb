@@ -11,7 +11,6 @@
 module Autopsist
   require 'date'
   require 'time'
-  require './StateMachineDSL'
   require './JsonDate'
   require './AutopsistHelper'
 
