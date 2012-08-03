@@ -35,9 +35,15 @@ module Autopsist
 
     def self.Deserialize(jsonString)
       jsonHash = GetHashFromJson(jsonString)
+
+
     end
 
     private
+
+    def self.CreateObject(jsonHash)
+
+    end
 
     def self.GetHashFromJson(jsonString)
       AutopsistHelper.Step(jsonString, 0)[1]

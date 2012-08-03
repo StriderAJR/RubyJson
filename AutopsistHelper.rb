@@ -54,7 +54,7 @@ module AutopsistHelper
 
     def self.GetArray(jsonString, pos)
 
-      array = Array.new
+   array = Array.new
       outArray = Array.new
       arrayElem = ""
 
@@ -82,6 +82,7 @@ module AutopsistHelper
           arrayElem = out[1]
         end
 
+        pos = SkipBlanks(jsonString, pos)
         char = jsonString[pos]
       end
 

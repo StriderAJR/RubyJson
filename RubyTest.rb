@@ -113,7 +113,7 @@ test.anotherClass.hashObj = {1=>hashObj1, 2=>hashObj2, 3=>hashObj3}
 
 
 
-#$jsonString = RubyAutopsist.Serialize(test)
+$jsonString = RubyAutopsist.Serialize(test)
 #$className = test.class
 #
 #print tracer.GetJson
@@ -125,36 +125,12 @@ test.anotherClass.hashObj = {1=>hashObj1, 2=>hashObj2, 3=>hashObj3}
 #str = arrayHash[2][1]
 #print str
 
+
+
 #print RubyAutopsist.Deserialize($jsonNET)
 
 $jsonNET = %q{
 {
-        "Id" : "2d",
-        "val1" : "MyTestClass",
-        "classVar" : {
-                "__id" : "bc",
-                "__className" : "Prob",
-                "test2" : 9999,
-                "classVar2" : {
-                        "__id" : "d3",
-                        "dateVal" : 1325376000000+0000,
-                        "val" : "3rd level class",
-                        "datetimeVal" : 981173106000+0000,
-                        "timeVal" : 1343711309000+0600,
-                        "__className" : "Prob2"
-                },
-                "test1" : "InnerClass Var1"
-        },
-        "val2" : 100500,
-        "trueVal" : true,
-        "__className" : "TestClass",
-        "pro" : {
-                "__id" : "a1",
-                "c" : 3,
-                "b" : 2,
-                "a" : 1
-        },
-        "name" : [1,2,3],
         "anotherClass" : {
                 "__id" : "19",
                 "__className" : "AnotherClass",
@@ -182,6 +158,16 @@ $jsonNET = %q{
                         }
                 ],
                 "arr" : ["This","is","array!"],
+                "arrArr": [
+                                    [
+                                      "a",
+                                      "b"
+                                    ],
+                                    [
+                                      1,
+                                      2
+                                    ]
+                ],
                 "hash" : {
                         "__id" : "0d",
                         "1" : "Regular hash"
@@ -213,7 +199,7 @@ $jsonNET = %q{
                         "1" : {
                                 "__id" : "33",
 
-                                "b" : "complicated",
+                                "b" : "comlicated",
                                 "a" : "Very"
                         },
                         "3" : {
@@ -244,24 +230,16 @@ $jsonNET = %q{
                                 "a" : "array of"
                         }
                 ]
-        },
-        "falseVal" : false
+        }
 
 }
 }
 
+#puts $jsonString
+puts
+puts RubyAutopsist.Deserialize($jsonString)
 
-puts RubyAutopsist.Deserialize($jsonNET)
-
-module A
-  class Testing
-    attr_accessor :val
-  end
-end
-
-tst = A::Testing.new
-#print tst.name
-
+#puts RubyAutopsist.Deserialize($jsonNET)
 
 
 #$jsonNET = %q{
