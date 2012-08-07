@@ -49,6 +49,13 @@ module Autopsist
 
     private
 
+    def self.GetSimpleValue(value)
+
+    end
+
+    #
+    # Returns variable of needed type
+    #
     def self.GetVariable(value)
       if value.class == String
         objectValue = value
@@ -60,6 +67,9 @@ module Autopsist
       objectValue
     end
 
+    #
+    # Fills object with values
+    #
     def self.FeedObject(jsonHash, object)
       #object = Serializable.new
       jsonHash.each do |key, value|
@@ -71,6 +81,9 @@ module Autopsist
       object
     end
 
+    #
+    # Fills hash with values
+    #
     def self.FeedHash(jsonHash)
       hash = Hash.new
       jsonHash.each do |key, value|
@@ -80,6 +93,9 @@ module Autopsist
       hash
     end
 
+    #
+    # Fills an array with values
+    #
     def self.FeedArray(jsonArray)
       array = Array.new
       jsonArray.each do |value|
@@ -89,6 +105,9 @@ module Autopsist
       array
     end
 
+    #
+    # Creates an object of the specified class OR hash
+    #
     def self.CreateObject(jsonHash)
       #object = Serializable.new
 
@@ -113,8 +132,32 @@ module Autopsist
       object
     end
 
+    #
+    # Wrap method to get hash from jsonString
+    #
     def self.GetHashFromJson(jsonString)
       AutopsistHelper.Step(jsonString, 0)[1]
+    end
+
+    #
+    # Parses json screening and escape sequences
+    #
+    def self.JsonString(string)
+      jsonString = ""
+      escape_sequences = ["\n", "\t", "\b", "\a", "\r", "\f"]
+      scanning_sequences = ["\"", "/", "\\"]
+
+      string.each_char do |char|
+        if escape_sequences.include? char
+          jsonString = jsonString + AutopsistHelper.GetUniCode(char)
+        elsif scanning_sequences.include? char
+          jsonString = jsonString + "\\" + char
+        else
+          jsonString = jsonString + char
+        end
+      end
+
+      jsonString
     end
 
     #
@@ -126,6 +169,7 @@ module Autopsist
       jsonString = ""
 
       if !(@TYPE_LIST.include? objectType) and !(@DATE_TYPE.include? objectType)
+        # object is class
         jsonString = jsonString + "{\n"
         jsonString = jsonString + CreatePropertiesJson(objectValue, tab+1) +  AutopsistHelper.Tabs(tab-1) + "}"
       elsif objectType == Array
@@ -133,7 +177,7 @@ module Autopsist
       elsif objectType == Hash
         jsonString = jsonString + CreateStructureJson(objectValue, tab+1)
       elsif objectType == String or objectType == Symbol
-        jsonString = jsonString + "\"" + objectValue.to_s + "\""
+        jsonString = jsonString + "\"" + JsonString(objectValue) + "\""
       elsif objectType == Fixnum
         jsonString = jsonString + objectValue.to_s
       elsif objectType == TrueClass
@@ -143,7 +187,7 @@ module Autopsist
       elsif objectType == NilClass
         jsonString = jsonString + "null"
       elsif @DATE_TYPE.include? objectType
-        jsonString = jsonString + JsonDate.ToMillisec(objectValue)
+        jsonString = jsonString + JsonDate.GetJsonDate(objectValue)
 
       else
         jsonString = jsonString + propertyValue.to_s
@@ -201,7 +245,6 @@ module Autopsist
       jsonString = ""
       propertyList = AutopsistHelper.GetPropertyList(object)
       propertyList.each_with_index do |property, index|
-#        propertyType = object.instance_variable_get(property).class
         propertyValue = object.instance_variable_get(property)
 
         # Insert property Name
@@ -229,39 +272,3 @@ module Autopsist
   end
 
 end
-
-
-##############################
-###Serialization into Hash####
-##############################
-
-#
-##
-#    # Returns object properties as hash
-#    #
-#    def self.CreateObjectHash(object)
-#      objectHash = Hash.new
-#      objectHash[object.class.to_s] = [Class, self.CreatePropertiesHash(object)]
-#      objectHash
-#    end
-#
-#    #
-#    # Returns all properties of an object as hash
-#    #
-#    def self.CreatePropertiesHash(object)
-#      propertyList = AutopsistHelper.rb.GetPropertyList(object)
-#      propertyHash = Hash.new
-#      propertyList.each do |property|
-#        propertyType = object.instance_variable_get(property).class
-#        propertyValue = object.instance_variable_get(property)
-#
-#        if @TYPE_LIST.include? propertyType.to_s
-#          propertyHash[property.to_s] = [propertyType, propertyValue]
-#        else
-#          propertyHash[property.to_s] = [Class, self.CreatePropertiesHash(propertyValue)]
-#        end
-#      end
-#
-#      propertyHash
-#    end
-

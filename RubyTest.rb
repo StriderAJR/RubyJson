@@ -68,7 +68,7 @@ tracer = RubyProvider.new
 
 test = TestClass.new
 test.Id = "2d931510-d99f-494a-8c67-87feb05e1594"
-test.val1 = "MyTestClass"
+test.val1 = "\t + \n + \b + \r + \f + \" + \\ + /"
 test.val2 = 100500
 test.name = [1,2,3]
 
@@ -114,6 +114,27 @@ test.anotherClass.hashObj = {1=>hashObj1, 2=>hashObj2, 3=>hashObj3}
 
 
 $jsonString = RubyAutopsist.Serialize(test)
+puts $jsonString
+
+object = RubyAutopsist.Deserialize($jsonString)
+puts object.val1
+#str = ""
+#str = str + "asd"
+#puts object.val1
+
+#puts
+#code = "0009"
+#escape = "\u" + code
+#puts "Hello" + escape + "World"
+
+
+####################################
+# Getting symbol code
+###########################################
+
+#str = "\t"
+#print str.unpack('U*').map{ |i| "\\u" + i.to_s(16).rjust(4, '0') }.join
+
 
 #$jsonNET = %q{
 #{
@@ -259,10 +280,10 @@ $jsonNET = %q{
 }
 }
 
-rubyObject = Object.new
-rubyObject = RubyAutopsist.Deserialize($jsonNET)
+#rubyObject = Object.new
+#rubyObject = RubyAutopsist.Deserialize($jsonNET)
 #rubyObject.class = TestClass
-print rubyObject.val1
+#print rubyObject.val1
 
 
 #####################################

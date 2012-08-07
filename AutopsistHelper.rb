@@ -26,6 +26,8 @@ module AutopsistHelper
     end
 
     def self.GetElem(jsonString, pos)
+      escape_sequences = {"0008" => "\b", "0009" => "\t", "000a" => "\n", "000c" => "\f", "000d" => "\r"}
+
       pos = SkipBlanks(jsonString, pos)
       char = jsonString[pos]
       arrayElem = ""
@@ -34,6 +36,17 @@ module AutopsistHelper
         pos = pos + 1 # Skip "
         char = jsonString[pos]
         while char != "\""
+          if char == "\\"
+            pos = pos + 1
+            char = jsonString[pos]
+
+            if char == "u"
+              code = jsonString[pos+1..pos+4]
+              char = escape_sequences[code]
+              pos = pos + 4
+            end
+          end
+
           arrayElem = arrayElem + char
 
           pos = pos+1
@@ -178,5 +191,12 @@ module AutopsistHelper
       out[1] = jsonHash
       out
     end
+
+  #
+  # Gets codes of all symbols in the string
+  #
+  def self.GetUniCode(str)
+    str.unpack('U*').map{ |i| "\\u" + i.to_s(16).rjust(4, '0') }.join
+  end
 
 end
