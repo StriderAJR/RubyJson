@@ -115,7 +115,206 @@ test.anotherClass.hashObj = {1=>hashObj1, 2=>hashObj2, 3=>hashObj3}
 
 $jsonString = RubyAutopsist.Serialize(test)
 
+#$jsonNET = %q{
+#{
+#        "__class" : "TestClass",
+#        "Id" : "2d",
+#        "val1" : "MyTestClass",
+#        "classVar" : {
+#                        "__id" : "bc",
+#                        "__class" : "Prob",
+#                        "test2" : 9999,
+#                        "classVar2" : {
+#                                "__id" : "d3",
+#                                "dateVal" : 1325376000000+0000,
+#                                "val" : "3rd level class",
+#                                "datetimeVal" : 981173106000+0000,
+#                                "timeVal" : 1343711309000+0600,
+#                                "__class" : "Prob2"
+#                        },
+#                        "test1" : "InnerClass Var1"
+#                }
+#}
+#}
 
+$jsonNET = %q{
+{
+        "Id" : "2d",
+        "val1" : "MyTestClass",
+        "classVar" : {
+                "__id" : "bc",
+                "__class" : "Prob",
+                "test2" : 9999,
+                "classVar2" : {
+                        "__id" : "d3",
+                        "dateVal" : 1325376000000+0000,
+                        "val" : "3rd level class",
+                        "datetimeVal" : 981173106000+0000,
+                        "timeVal" : 1343711309000+0600,
+                        "__class" : "Prob2"
+                },
+                "test1" : "InnerClass Var1"
+        },
+        "val2" : 100500,
+        "trueVal" : true,
+        "__class" : "TestClass",
+        "pro" : {
+                "__id" : "a1",
+                "c" : 3,
+                "b" : 2,
+                "a" : 1
+        },
+        "name" : [1,2,3],
+        "anotherClass" : {
+                "__id" : "19",
+                "__class" : "AnotherClass",
+                "arrObj" : [
+                        {
+                                "__id" : "8e",
+
+                                "testVal" : "TestObj1 for Arrays",
+                                "__class" : "TestObject"
+                        },
+                        {
+                                "__id" : "07",
+
+                                "__class" : "TestObject",
+                                "testVal" : "TestObj2 for Arrays",
+                                "val2" : "Another val2"
+                        },
+                        {
+                                "__id" : "a4",
+
+                                "val3" : "obj3 val3",
+                                "__class" : "TestObject",
+                                "testVal" : "TestObj3 for Arrays",
+                                "val2" : "obj3 val2"
+                        }
+                ],
+                "arr" : ["This","is","array!"],
+                "hash" : {
+                        "__id" : "0d",
+                        "1" : "Regular hash"
+                },
+                "hashObj" : {
+                        "__id" : "a8",
+                        "1" : {
+                                "__id" : "d8",
+
+                                "__class" : "TestObject",
+                                "testVal" : 100500
+                        },
+                        "3" : {
+                                "__id" : "4d",
+
+                                "testVal" : "I must not be Lazy!!",
+                                "__class" : "TestObject"
+                        },
+                        "2" : {
+                                "__id" : "25",
+
+                                "testVal" : "Too Lazy",
+                                "__class" : "TestObject"
+                        }
+                },
+                "hashHash" : {
+                        "__id" : "10",
+                        "2" : "hash",
+                        "1" : {
+                                "__id" : "33",
+
+                                "b" : "comlicated",
+                                "a" : "Very"
+                        },
+                        "3" : {
+                                "__id" : "51",
+
+                                "a" : "of",
+                                "z" : "hashes"
+                        }
+                },
+                "hashArr" : {
+                        "__id" : "39",
+                        "3" : true,
+                        "1" : ["hash","of"],
+                        "2" : ["arrays"],
+                        "4" : false
+                },
+                "arrHash" : [
+                        {
+                                "__id" : "3e",
+
+                                "1" : "This",
+                                "2" : "is"
+                        },
+                        {
+                                "__id" : "65",
+
+                                "b" : "hashes",
+                                "a" : "array of"
+                        }
+                ]
+        },
+        "falseVal" : false
+}
+}
+
+rubyObject = Object.new
+rubyObject = RubyAutopsist.Deserialize($jsonNET)
+#rubyObject.class = TestClass
+print rubyObject.val1
+
+
+#####################################
+# Testing dynamic properties
+#####################################
+
+#class Client
+#  def add_attrs(attrs)
+#    attrs.each do |var, value|
+#      #class_eval { attr_accessor var }
+#      (class << self ; self ; end).class_eval { attr_accessor var }
+#      instance_variable_set "@#{var}", value
+#    end
+#  end
+#end
+
+#
+#client = Client.new
+#hash = {"val1" => "Hello"}
+#client.add_attrs(hash)
+#hash = {"val2" => "123"}
+#client.add_attrs(hash)
+#puts client.val1
+#puts client.val2
+#puts
+#
+#puts RubyAutopsist.Serialize(client)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#####################################
+# Full class name testing
+#####################################
 
 #module A
 #  class AClass < Serializable
@@ -130,159 +329,27 @@ $jsonString = RubyAutopsist.Serialize(test)
 #p a.class.name
 #p a.__class
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+###################################
+# Deserialization into Hash testing
+###################################
 
 #$className = test.class
 #
 #print tracer.GetJson
 #puts
 
-
 #hash = RubyAutopsist.Deserialize($jsonNET)
 #arrayHash = hash["arrArr"]
 #str = arrayHash[2][1]
 #print str
 
-
-
 #print RubyAutopsist.Deserialize($jsonNET)
-
-#$jsonNET = %q{
-#{
-#        "anotherClass" : {
-#                "__id" : "19",
-#                "__className" : "AnotherClass",
-#                "arrObj" : [
-#                        {
-#                                "__id" : "8e",
-#
-#                                "testVal" : "TestObj1 for Arrays",
-#                                "__className" : "TestObject"
-#                        },
-#                        {
-#                                "__id" : "07",
-#
-#                                "__className" : "TestObject",
-#                                "testVal" : "TestObj2 for Arrays",
-#                                "val2" : "Another val2"
-#                        },
-#                        {
-#                                "__id" : "a4",
-#
-#                                "val3" : "obj3 val3",
-#                                "__className" : "TestObject",
-#                                "testVal" : "TestObj3 for Arrays",
-#                                "val2" : "obj3 val2"
-#                        }
-#                ],
-#                "arr" : ["This","is","array!"],
-#                "arrArr": [
-#                                    [
-#                                      "a",
-#                                      "b"
-#                                    ],
-#                                    [
-#                                      1,
-#                                      2
-#                                    ]
-#                ],
-#                "hash" : {
-#                        "__id" : "0d",
-#                        "1" : "Regular hash"
-#                },
-#                "hashObj" : {
-#                        "__id" : "a8",
-#                        "1" : {
-#                                "__id" : "d8",
-#
-#                                "__className" : "TestObject",
-#                                "testVal" : 100500
-#                        },
-#                        "3" : {
-#                                "__id" : "4d",
-#
-#                                "testVal" : "I must not be Lazy!!",
-#                                "__className" : "TestObject"
-#                        },
-#                        "2" : {
-#                                "__id" : "25",
-#
-#                                "testVal" : "Too Lazy",
-#                                "__className" : "TestObject"
-#                        }
-#                },
-#                "hashHash" : {
-#                        "__id" : "10",
-#                        "2" : "hash",
-#                        "1" : {
-#                                "__id" : "33",
-#
-#                                "b" : "comlicated",
-#                                "a" : "Very"
-#                        },
-#                        "3" : {
-#                                "__id" : "51",
-#
-#                                "a" : "of",
-#                                "z" : "hashes"
-#                        }
-#                },
-#                "hashArr" : {
-#                        "__id" : "39",
-#                        "3" : true,
-#                        "1" : ["hash","of"],
-#                        "2" : ["arrays"],
-#                        "4" : false
-#                },
-#                "arrHash" : [
-#                        {
-#                                "__id" : "3e",
-#
-#                                "1" : "This",
-#                                "2" : "is"
-#                        },
-#                        {
-#                                "__id" : "65",
-#
-#                                "b" : "hashes",
-#                                "a" : "array of"
-#                        }
-#                ]
-#        }
-#
-#}
-#}
 
 #puts $jsonString
 #puts
 #puts RubyAutopsist.Deserialize($jsonString)
 
 #puts RubyAutopsist.Deserialize($jsonNET)
-
 
 #$jsonNET = %q{
 #{
@@ -408,38 +475,21 @@ $jsonString = RubyAutopsist.Serialize(test)
 
 #print RubyAutopsist.Deserialize($jsonNET)
 
-
 #print RubyAutopsist.Deserialize($jsonNET)
 #print $jsonNET.class
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+############################################
+# Getting property by name
+############################################
 
 #tester = Tester.new
 #varName = "@foo"
 #varValue = "Hello, World!"
 #tester.instance_variable_set(varName, varValue)
 
-
-
-
-
-
-
-
-
+##########################
+# Guid generation
+##########################
 
 #guid = SecureRandom.uuid
 #p guid.class
@@ -451,10 +501,9 @@ $jsonString = RubyAutopsist.Serialize(test)
 #puts
 #puts
 
-
-
-
-
+#########################
+# DateTime Testing
+#########################
 
 # DATETIME HENTAI
 #dt = DateTime.now
@@ -498,16 +547,9 @@ $jsonString = RubyAutopsist.Serialize(test)
 #puts date.class
 #puts DateToDateTime(date).class
 
-
-
-
-
-
-
-
-
-
-
+#####################################
+# Complicated class structures
+#####################################
 
 # Down are different HENTAI things
 

@@ -20,6 +20,14 @@ module Autopsist
     def initialize
       @__class = self.class.to_s
     end
+
+    def add_attrs(attrs)
+      attrs.each do |var, value|
+        #class_eval { attr_accessor var }
+        (class << self ; self ; end).class_eval { attr_accessor var }
+        instance_variable_set "@#{var}", value
+        end
+    end
   end
 
   class RubyAutopsist
@@ -36,13 +44,73 @@ module Autopsist
     def self.Deserialize(jsonString)
       jsonHash = GetHashFromJson(jsonString)
 
-
+      CreateObject(jsonHash)
     end
 
     private
 
-    def self.CreateObject(jsonHash)
+    def self.GetVariable(value)
+      if value.class == String
+        objectValue = value
+      elsif value.class == Array
+        objectValue = FeedArray(value)
+      elsif value.class == Hash
+        objectValue = CreateObject(value)
+      end
+      objectValue
+    end
 
+    def self.FeedObject(jsonHash, object)
+      #object = Serializable.new
+      jsonHash.each do |key, value|
+        #objectValue = GetVariable(value)
+        #object.instance_variable_set("@"+key, objectValue)
+        objectValue = {key => GetVariable(value)}
+        object.add_attrs(objectValue)
+      end
+      object
+    end
+
+    def self.FeedHash(jsonHash)
+      hash = Hash.new
+      jsonHash.each do |key, value|
+        objectValue = GetVariable(value)
+        hash[key] = objectValue
+      end
+      hash
+    end
+
+    def self.FeedArray(jsonArray)
+      array = Array.new
+      jsonArray.each do |value|
+        objectValue = GetVariable(value)
+        array.push(objectValue)
+      end
+      array
+    end
+
+    def self.CreateObject(jsonHash)
+      #object = Serializable.new
+
+      if jsonHash.has_key? "__class"
+        # That's object
+        className = jsonHash["__class"]
+
+        begin
+          classObj = Object.const_get className
+          object = classObj.new
+
+          rescue Exception => msg
+            puts msg
+        end
+        object = FeedObject(jsonHash, object)
+      else
+        # That's hash
+        hash = Hash.new
+        object = FeedHash(jsonHash)
+      end
+
+      object
     end
 
     def self.GetHashFromJson(jsonString)
