@@ -2,7 +2,7 @@
 # Test file for RubyAutopsist Module
 #
 
-require "./RubyAutopsist"
+require "./RubyJson"
 include Autopsist
 
 require 'date'
@@ -113,106 +113,97 @@ test.anotherClass.hashObj = {1=>hashObj1, 2=>hashObj2, 3=>hashObj3}
 
 
 
-$jsonString = RubyAutopsist.Serialize(test)
+$jsonString = RubyJson.Serialize(test)
 puts $jsonString
-object = RubyAutopsist.Deserialize($jsonString)
+object = RubyJson.Deserialize($jsonString)
 
+puts object.Id
+puts object.Id.class
+puts
 
+puts object.val1
+puts object.val1.class
+puts
 
+puts object.val2
+puts object.val2.class
+puts
 
+puts object.name
+puts object.name.class
+puts
 
+puts object.classVar.test1
+puts object.classVar.test1.class
+puts
 
+puts object.classVar.test2
+puts object.classVar.test2.class
+puts
 
+puts object.classVar.classVar2
+puts object.classVar.classVar2.class
+puts
 
+puts object.classVar.classVar2.val
+puts object.classVar.classVar2.val.class
+puts
 
+puts object.classVar.classVar2.timeVal
+puts object.classVar.classVar2.timeVal.class
+puts
 
-#puts object.Id
-#puts object.Id.class
-#puts
-#
-#puts object.val1
-#puts object.val1.class
-#puts
-#
-#puts object.val2
-#puts object.val2.class
-#puts
-#
-#puts object.name
-#puts object.name.class
-#puts
-#
-#puts object.classVar.test1
-#puts object.classVar.test1.class
-#puts
-#
-#puts object.classVar.test2
-#puts object.classVar.test2.class
-#puts
-#
-#puts object.classVar.classVar2
-#puts object.classVar.classVar2.class
-#puts
-#
-#puts object.classVar.classVar2.val
-#puts object.classVar.classVar2.val.class
-#puts
-#
-#puts object.classVar.classVar2.timeVal
-#puts object.classVar.classVar2.timeVal.class
-#puts
-#
-#puts object.classVar.classVar2.dateVal
-#puts object.classVar.classVar2.dateVal.class
-#puts
-#
-#puts object.classVar.classVar2.datetimeVal
-#puts object.classVar.classVar2.datetimeVal.class
-#puts
-#
-#puts object.pro
-#puts object.pro.class
-#puts
-#
-#puts object.trueVal
-#puts object.trueVal.class
-#puts
-#
-#puts object.falseVal
-#puts object.falseVal.class
-#puts
-#
-#puts object.nilVal
-#puts object.nilVal.class
-#puts
-#
-#puts object.anotherClass.arrHash
-#puts object.anotherClass.arrHash.class
-#puts
-#
-#puts object.anotherClass.arrArr
-#puts object.anotherClass.arrArr.class
-#puts
-#
-#puts object.anotherClass.arrObj
-#puts object.anotherClass.arrObj.class
-#puts
-#
-#puts object.anotherClass.hash
-#puts object.anotherClass.hash.class
-#puts
-#
-#puts object.anotherClass.hashArr
-#puts object.anotherClass.hashArr.class
-#puts
-#
-#puts object.anotherClass.hashHash
-#puts object.anotherClass.hashHash.class
-#puts
-#
-#puts object.anotherClass.hashObj
-#puts object.anotherClass.hashObj.class
-#puts
+puts object.classVar.classVar2.dateVal
+puts object.classVar.classVar2.dateVal.class
+puts
+
+puts object.classVar.classVar2.datetimeVal
+puts object.classVar.classVar2.datetimeVal.class
+puts
+
+puts object.pro
+puts object.pro.class
+puts
+
+puts object.trueVal
+puts object.trueVal.class
+puts
+
+puts object.falseVal
+puts object.falseVal.class
+puts
+
+puts object.nilVal
+puts object.nilVal.class
+puts
+
+puts object.anotherClass.arrHash
+puts object.anotherClass.arrHash.class
+puts
+
+puts object.anotherClass.arrArr
+puts object.anotherClass.arrArr.class
+puts
+
+puts object.anotherClass.arrObj
+puts object.anotherClass.arrObj.class
+puts
+
+puts object.anotherClass.hash
+puts object.anotherClass.hash.class
+puts
+
+puts object.anotherClass.hashArr
+puts object.anotherClass.hashArr.class
+puts
+
+puts object.anotherClass.hashHash
+puts object.anotherClass.hashHash.class
+puts
+
+puts object.anotherClass.hashObj
+puts object.anotherClass.hashObj.class
+puts
 
 
 ##############################
