@@ -14,6 +14,9 @@ module Autopsist
   require './JsonDate'
   require './AutopsistHelper'
 
+  include AutopsistHelper
+  include JsonEncoder
+
   class Serializable
     attr_accessor :__class
 
@@ -31,7 +34,7 @@ module Autopsist
   end
 
   class RubyAutopsist
-    @TYPE_LIST = [Symbol, String, Fixnum, Array, Hash, NilClass, TrueClass, FalseClass]
+    @TYPE_LIST = [Symbol, String, Fixnum, Numeric, Float, Rational, Array, Hash, NilClass, TrueClass, FalseClass]
     @DATE_TYPE = [Date, Time, DateTime]
 
     #
@@ -49,8 +52,27 @@ module Autopsist
 
     private
 
-    def self.GetSimpleValue(value)
-
+    def self.DecodeValue(value)
+      if value == "null"
+        nil
+      elsif EncodedValueIsTrue(value)
+        true
+      elsif EncodedValueIsFalse(value)
+        false
+      elsif EncodedValueIsDateTime(value)
+        DecodeValueToDateTime(value)
+      elsif EncodedValueIsGuid(value)
+        value
+        #DecodeValueToGuid(value)
+        #elsif EncodedValueIsTimeSpan
+        #  DecodeValueToTimeSpan(value)
+      elsif EncodedValueIsFloat(value)
+        DecodeValueToFloat(value)
+      elsif EncodedValueIsFixnum(value)
+        DecodeValueToInteger(value)
+      else
+        value
+      end
     end
 
     #
@@ -58,7 +80,7 @@ module Autopsist
     #
     def self.GetVariable(value)
       if value.class == String
-        objectValue = value
+        objectValue = DecodeValue(value)
       elsif value.class == Array
         objectValue = FeedArray(value)
       elsif value.class == Hash
@@ -178,8 +200,8 @@ module Autopsist
         jsonString = jsonString + CreateStructureJson(objectValue, tab+1)
       elsif objectType == String or objectType == Symbol
         jsonString = jsonString + "\"" + JsonString(objectValue) + "\""
-      elsif objectType == Fixnum
-        jsonString = jsonString + objectValue.to_s
+      #elsif objectType == Fixnum
+      #  jsonString = jsonString + objectValue.to_s
       elsif objectType == TrueClass
         jsonString = jsonString + "true"
       elsif objectType == FalseClass
@@ -190,7 +212,7 @@ module Autopsist
         jsonString = jsonString + JsonDate.GetJsonDate(objectValue)
 
       else
-        jsonString = jsonString + propertyValue.to_s
+        jsonString = jsonString + objectValue.to_s
       end
 
       jsonString

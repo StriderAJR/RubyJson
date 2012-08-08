@@ -68,7 +68,7 @@ tracer = RubyProvider.new
 
 test = TestClass.new
 test.Id = "2d931510-d99f-494a-8c67-87feb05e1594"
-test.val1 = "\t + \n + \b + \r + \f + \" + \\ + /"
+test.val1 = "Hello,\t my \n dear world. \b How \r do \f you \" do \\ ? /"
 test.val2 = 100500
 test.name = [1,2,3]
 
@@ -115,9 +115,126 @@ test.anotherClass.hashObj = {1=>hashObj1, 2=>hashObj2, 3=>hashObj3}
 
 $jsonString = RubyAutopsist.Serialize(test)
 puts $jsonString
-
 object = RubyAutopsist.Deserialize($jsonString)
-puts object.val1
+
+
+
+
+
+
+
+
+
+
+#puts object.Id
+#puts object.Id.class
+#puts
+#
+#puts object.val1
+#puts object.val1.class
+#puts
+#
+#puts object.val2
+#puts object.val2.class
+#puts
+#
+#puts object.name
+#puts object.name.class
+#puts
+#
+#puts object.classVar.test1
+#puts object.classVar.test1.class
+#puts
+#
+#puts object.classVar.test2
+#puts object.classVar.test2.class
+#puts
+#
+#puts object.classVar.classVar2
+#puts object.classVar.classVar2.class
+#puts
+#
+#puts object.classVar.classVar2.val
+#puts object.classVar.classVar2.val.class
+#puts
+#
+#puts object.classVar.classVar2.timeVal
+#puts object.classVar.classVar2.timeVal.class
+#puts
+#
+#puts object.classVar.classVar2.dateVal
+#puts object.classVar.classVar2.dateVal.class
+#puts
+#
+#puts object.classVar.classVar2.datetimeVal
+#puts object.classVar.classVar2.datetimeVal.class
+#puts
+#
+#puts object.pro
+#puts object.pro.class
+#puts
+#
+#puts object.trueVal
+#puts object.trueVal.class
+#puts
+#
+#puts object.falseVal
+#puts object.falseVal.class
+#puts
+#
+#puts object.nilVal
+#puts object.nilVal.class
+#puts
+#
+#puts object.anotherClass.arrHash
+#puts object.anotherClass.arrHash.class
+#puts
+#
+#puts object.anotherClass.arrArr
+#puts object.anotherClass.arrArr.class
+#puts
+#
+#puts object.anotherClass.arrObj
+#puts object.anotherClass.arrObj.class
+#puts
+#
+#puts object.anotherClass.hash
+#puts object.anotherClass.hash.class
+#puts
+#
+#puts object.anotherClass.hashArr
+#puts object.anotherClass.hashArr.class
+#puts
+#
+#puts object.anotherClass.hashHash
+#puts object.anotherClass.hashHash.class
+#puts
+#
+#puts object.anotherClass.hashObj
+#puts object.anotherClass.hashObj.class
+#puts
+
+
+##############################
+# DateTime
+##############################
+
+#puts DateTime.parse('20010203T040506+0700')
+
+#datetime = DateTime.new(2001,2,3,4,5,7,'+0200')
+##datetime = DateTime.now
+#puts datetime
+#dateString = datetime.strftime("%Q%z").to_s
+#time = Time.at(dateString.to_i/1000)
+#date = time.to_datetime
+##date.new_offset('+5')
+#puts date
+#puts
+
+##############################
+# Escape sequences
+###############################
+#puts object.val2.class
 #str = ""
 #str = str + "asd"
 #puts object.val1
@@ -126,6 +243,23 @@ puts object.val1
 #code = "0009"
 #escape = "\u" + code
 #puts "Hello" + escape + "World"
+
+#################################
+# Fixnum, Float, BigDecimal, Bignum
+##################################
+
+#i = 1000000000
+#while i.class == Fixnum
+#  i = i + 1
+#end
+#puts i.to_s + " is the first Bignum value"
+#bignum = 1073741824
+
+#f = 0.6666666666666666666666666666666666666666666666666# + 0.333333333333333333333333333333333333333333333
+#puts f.to_s
+
+#i = Integer("66666666")
+#puts i.class
 
 
 ####################################
@@ -158,127 +292,127 @@ puts object.val1
 #}
 #}
 
-$jsonNET = %q{
-{
-        "Id" : "2d",
-        "val1" : "MyTestClass",
-        "classVar" : {
-                "__id" : "bc",
-                "__class" : "Prob",
-                "test2" : 9999,
-                "classVar2" : {
-                        "__id" : "d3",
-                        "dateVal" : 1325376000000+0000,
-                        "val" : "3rd level class",
-                        "datetimeVal" : 981173106000+0000,
-                        "timeVal" : 1343711309000+0600,
-                        "__class" : "Prob2"
-                },
-                "test1" : "InnerClass Var1"
-        },
-        "val2" : 100500,
-        "trueVal" : true,
-        "__class" : "TestClass",
-        "pro" : {
-                "__id" : "a1",
-                "c" : 3,
-                "b" : 2,
-                "a" : 1
-        },
-        "name" : [1,2,3],
-        "anotherClass" : {
-                "__id" : "19",
-                "__class" : "AnotherClass",
-                "arrObj" : [
-                        {
-                                "__id" : "8e",
-
-                                "testVal" : "TestObj1 for Arrays",
-                                "__class" : "TestObject"
-                        },
-                        {
-                                "__id" : "07",
-
-                                "__class" : "TestObject",
-                                "testVal" : "TestObj2 for Arrays",
-                                "val2" : "Another val2"
-                        },
-                        {
-                                "__id" : "a4",
-
-                                "val3" : "obj3 val3",
-                                "__class" : "TestObject",
-                                "testVal" : "TestObj3 for Arrays",
-                                "val2" : "obj3 val2"
-                        }
-                ],
-                "arr" : ["This","is","array!"],
-                "hash" : {
-                        "__id" : "0d",
-                        "1" : "Regular hash"
-                },
-                "hashObj" : {
-                        "__id" : "a8",
-                        "1" : {
-                                "__id" : "d8",
-
-                                "__class" : "TestObject",
-                                "testVal" : 100500
-                        },
-                        "3" : {
-                                "__id" : "4d",
-
-                                "testVal" : "I must not be Lazy!!",
-                                "__class" : "TestObject"
-                        },
-                        "2" : {
-                                "__id" : "25",
-
-                                "testVal" : "Too Lazy",
-                                "__class" : "TestObject"
-                        }
-                },
-                "hashHash" : {
-                        "__id" : "10",
-                        "2" : "hash",
-                        "1" : {
-                                "__id" : "33",
-
-                                "b" : "comlicated",
-                                "a" : "Very"
-                        },
-                        "3" : {
-                                "__id" : "51",
-
-                                "a" : "of",
-                                "z" : "hashes"
-                        }
-                },
-                "hashArr" : {
-                        "__id" : "39",
-                        "3" : true,
-                        "1" : ["hash","of"],
-                        "2" : ["arrays"],
-                        "4" : false
-                },
-                "arrHash" : [
-                        {
-                                "__id" : "3e",
-
-                                "1" : "This",
-                                "2" : "is"
-                        },
-                        {
-                                "__id" : "65",
-
-                                "b" : "hashes",
-                                "a" : "array of"
-                        }
-                ]
-        },
-        "falseVal" : false
-}
-}
+#$jsonNET = %q{
+#{
+#        "Id" : "2d",
+#        "val1" : "MyTestClass",
+#        "classVar" : {
+#                "__id" : "bc",
+#                "__class" : "Prob",
+#                "test2" : 9999,
+#                "classVar2" : {
+#                        "__id" : "d3",
+#                        "dateVal" : 1325376000000+0000,
+#                        "val" : "3rd level class",
+#                        "datetimeVal" : 981173106000+0000,
+#                        "timeVal" : 1343711309000+0600,
+#                        "__class" : "Prob2"
+#                },
+#                "test1" : "InnerClass Var1"
+#        },
+#        "val2" : 100500,
+#        "trueVal" : true,
+#        "__class" : "TestClass",
+#        "pro" : {
+#                "__id" : "a1",
+#                "c" : 3,
+#                "b" : 2,
+#                "a" : 1
+#        },
+#        "name" : [1,2,3],
+#        "anotherClass" : {
+#                "__id" : "19",
+#                "__class" : "AnotherClass",
+#                "arrObj" : [
+#                        {
+#                                "__id" : "8e",
+#
+#                                "testVal" : "TestObj1 for Arrays",
+#                                "__class" : "TestObject"
+#                        },
+#                        {
+#                                "__id" : "07",
+#
+#                                "__class" : "TestObject",
+#                                "testVal" : "TestObj2 for Arrays",
+#                                "val2" : "Another val2"
+#                        },
+#                        {
+#                                "__id" : "a4",
+#
+#                                "val3" : "obj3 val3",
+#                                "__class" : "TestObject",
+#                                "testVal" : "TestObj3 for Arrays",
+#                                "val2" : "obj3 val2"
+#                        }
+#                ],
+#                "arr" : ["This","is","array!"],
+#                "hash" : {
+#                        "__id" : "0d",
+#                        "1" : "Regular hash"
+#                },
+#                "hashObj" : {
+#                        "__id" : "a8",
+#                        "1" : {
+#                                "__id" : "d8",
+#
+#                                "__class" : "TestObject",
+#                                "testVal" : 100500
+#                        },
+#                        "3" : {
+#                                "__id" : "4d",
+#
+#                                "testVal" : "I must not be Lazy!!",
+#                                "__class" : "TestObject"
+#                        },
+#                        "2" : {
+#                                "__id" : "25",
+#
+#                                "testVal" : "Too Lazy",
+#                                "__class" : "TestObject"
+#                        }
+#                },
+#                "hashHash" : {
+#                        "__id" : "10",
+#                        "2" : "hash",
+#                        "1" : {
+#                                "__id" : "33",
+#
+#                                "b" : "comlicated",
+#                                "a" : "Very"
+#                        },
+#                        "3" : {
+#                                "__id" : "51",
+#
+#                                "a" : "of",
+#                                "z" : "hashes"
+#                        }
+#                },
+#                "hashArr" : {
+#                        "__id" : "39",
+#                        "3" : true,
+#                        "1" : ["hash","of"],
+#                        "2" : ["arrays"],
+#                        "4" : false
+#                },
+#                "arrHash" : [
+#                        {
+#                                "__id" : "3e",
+#
+#                                "1" : "This",
+#                                "2" : "is"
+#                        },
+#                        {
+#                                "__id" : "65",
+#
+#                                "b" : "hashes",
+#                                "a" : "array of"
+#                        }
+#                ]
+#        },
+#        "falseVal" : false
+#}
+#}
 
 #rubyObject = Object.new
 #rubyObject = RubyAutopsist.Deserialize($jsonNET)
@@ -311,27 +445,6 @@ $jsonNET = %q{
 #puts
 #
 #puts RubyAutopsist.Serialize(client)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #####################################
 # Full class name testing

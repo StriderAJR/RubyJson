@@ -1,3 +1,7 @@
+require 'date'
+require 'time'
+require 'securerandom'
+
 module AutopsistHelper
     #
     # Returns array of all properties of targeted object
@@ -199,4 +203,70 @@ module AutopsistHelper
     str.unpack('U*').map{ |i| "\\u" + i.to_s(16).rjust(4, '0') }.join
   end
 
+end
+
+module JsonEncoder
+  def EncodedValueIsTrue(value)
+    if value == "true"
+      true
+    else
+      false
+    end
+  end
+
+  def EncodedValueIsFalse(value)
+    if value == "false"
+      true
+    else
+      false
+    end
+  end
+
+  def EncodedValueIsDateTime(value)
+    if value[0..4] == "/Date" and value[-2,2] == ")/"
+      true
+    else
+      false
+    end
+  end
+
+  def EncodedValueIsGuid(value)
+    !!(value =~/^(\{?([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}\}?)$/)
+  end
+
+  #def EncodedValueIsTimeSpan(value)
+  #
+  #end
+
+  def EncodedValueIsFloat(value)
+    !!(value =~/^[+-]?[0-9]+[.][0-9]+$/)
+  end
+
+  def EncodedValueIsFixnum(value)
+    !!(value =~ /^[-+]?[0-9]+$/)
+  end
+
+  def DecodeValueToDateTime(value)
+    time = Time.at(value[6..-3].to_i/1000)
+    hour = time.hour - time.utc_offset/3600
+    DateTime.new(time.year, time.month, time.mday, hour, time.min, time.sec, value[-7..-3])
+  end
+
+  #def DecodeValueToTimeSpan(value)
+  #
+  #end
+
+  def DecodeValueToFloat(value)
+    accuracy = value.length - value.index(".") - 1
+
+    if accuracy > 16
+      BigDecimal.new(value)
+    else
+      value.to_f
+    end
+  end
+
+  def DecodeValueToInteger(value)
+    Integer(value)
+  end
 end
