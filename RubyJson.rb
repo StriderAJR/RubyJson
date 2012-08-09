@@ -1,5 +1,5 @@
 ########################################################
-#                      RubyAutopsist                   #
+#                         RubyJson                     #
 #                Json Serializer for Ruby              #
 ########################################################
 #               Created by Alex J. Ranger              #
@@ -8,13 +8,13 @@
 ########################################################
 
 
-module Autopsist
+module Json
   require 'date'
   require 'time'
   require './JsonDate'
   require './RubyJsonExtension'
 
-  include JsonEncoder
+  include JsonWriter
   include JsonDecoder
   include JsonTools
 
@@ -36,91 +36,140 @@ module Autopsist
   end
 
   class RubyJson
-    @TYPE_LIST = [Symbol, String, Fixnum, Numeric, Float, Rational, Array, Hash, NilClass, TrueClass, FalseClass]
-    @DATE_TYPE = [Date, Time, DateTime]
-
     #
     # Returns Json of an object
     #
     def self.Serialize(object)
-      CreateJson(object, 0)
+      JsonWriter.CreateJson(object, 0)
     end
 
+    #
+    #  Returns Ruby object
+    #
     def self.Deserialize(jsonString)
-      jsonHash = GetHashFromJson(jsonString)
+      jsonHash = JsonReader.GetHashFromJson(jsonString)
 
-      CreateObject(jsonHash)
+      JsonReader.CreateObject(jsonHash)
+    end
+  end
+
+  #############################################
+  # RubyJson mapper for IronRuby calls
+  #############################################
+  class RubyProvider
+    def GetHash
+      $hashString
     end
 
-    private
-
-    #
-    # Creates an object of the specified class OR hash
-    #
-    def self.CreateObject(jsonHash)
-      if jsonHash.has_key? "__class"
-        # That's object
-        className = jsonHash["__class"]
-
-        begin
-          classObj = Object.const_get className
-          object = classObj.new
-
-          rescue Exception => msg
-            puts msg
-        end
-        object = JsonEncoder.FeedObject(jsonHash, object)
-      else
-        # That's hash
-        #hash = Hash.new
-        object = JsonEncoder.FeedHash(jsonHash)
-      end
-
-      object
+    def GetJson
+      $jsonString
     end
 
-
-
-    #
-    # Wrap method to get hash from jsonString
-    #
-    def self.GetHashFromJson(jsonString)
-      JsonEncoder.Step(jsonString, 0)[1]
+    def Serialize(object)
+      $jsonString = RubyJson.Serialize(object)
     end
 
-    #
-    # Creates Json string for any type of object
-    #
-    def self.CreateJson(objectValue, tab)
-      objectType = objectValue.class
-
-      jsonString = ""
-
-      if !(@TYPE_LIST.include? objectType) and !(@DATE_TYPE.include? objectType)
-        # object is class
-        jsonString = jsonString + "{\n"
-        jsonString = jsonString + JsonEncoder.CreatePropertiesJson(objectValue, tab+1) +  JsonTools.Tabs(tab-1) + "}"
-      elsif objectType == Array
-        jsonString = jsonString + JsonEncoder.CreateStructureJson(objectValue, tab+1)
-      elsif objectType == Hash
-        jsonString = jsonString + JsonEncoder.CreateStructureJson(objectValue, tab+1)
-      elsif objectType == String or objectType == Symbol
-        jsonString = jsonString + "\"" + JsonDecoder.JsonString(objectValue) + "\""
-      elsif objectType == TrueClass
-        jsonString = jsonString + "true"
-      elsif objectType == FalseClass
-        jsonString = jsonString + "false"
-      elsif objectType == NilClass
-        jsonString = jsonString + "null"
-      elsif @DATE_TYPE.include? objectType
-        jsonString = jsonString + JsonDate.GetJsonDate(objectValue)
-      else
-        jsonString = jsonString + objectValue.to_s
-      end
-
-      jsonString
+    def Deserialize(json)
+      $object = RubyJson.Deserialize(json)
     end
 
+    def GetClassName
+      $className
+    end
+
+    def GetRubyObject
+      $object
+    end
+
+    def PrintRubyObject
+      puts $object.Id
+      puts $object.Id.class
+      puts
+
+      puts $object.val1
+      puts $object.val1.class
+      puts
+
+      puts $object.val2
+      puts $object.val2.class
+      puts
+
+      puts $object.name
+      puts $object.name.class
+      puts
+
+      puts $object.classVar.test1
+      puts $object.classVar.test1.class
+      puts
+
+      puts $object.classVar.test2
+      puts $object.classVar.test2.class
+      puts
+
+      puts $object.classVar.classVar2
+      puts $object.classVar.classVar2.class
+      puts
+
+      puts $object.classVar.classVar2.val
+      puts $object.classVar.classVar2.val.class
+      puts
+
+      puts $object.classVar.classVar2.timeVal
+      puts $object.classVar.classVar2.timeVal.class
+      puts
+
+      puts $object.classVar.classVar2.dateVal
+      puts $object.classVar.classVar2.dateVal.class
+      puts
+
+      puts $object.classVar.classVar2.datetimeVal
+      puts $object.classVar.classVar2.datetimeVal.class
+      puts
+
+      puts $object.pro
+      puts $object.pro.class
+      puts
+
+      puts $object.trueVal
+      puts $object.trueVal.class
+      puts
+
+      puts $object.falseVal
+      puts $object.falseVal.class
+      puts
+
+      puts $object.nilVal
+      puts $object.nilVal.class
+      puts
+
+      puts $object.anotherClass.arrHash
+      puts $object.anotherClass.arrHash.class
+      puts
+
+      puts $object.anotherClass.arrArr
+      puts $object.anotherClass.arrArr.class
+      puts
+
+      puts $object.anotherClass.arrObj
+      puts $object.anotherClass.arrObj.class
+      puts
+
+      puts $object.anotherClass.hash
+      puts $object.anotherClass.hash.class
+      puts
+
+      puts $object.anotherClass.hashArr
+      puts $object.anotherClass.hashArr.class
+      puts
+
+      puts $object.anotherClass.hashHash
+      puts $object.anotherClass.hashHash.class
+      puts
+
+      puts $object.anotherClass.hashObj
+      puts $object.anotherClass.hashObj.class
+      puts
+    end
   end
 
 end

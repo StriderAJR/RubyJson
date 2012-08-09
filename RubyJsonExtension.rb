@@ -3,7 +3,254 @@ require 'date'
 require 'time'
 require 'securerandom'
 
+module JsonWriter
+  #
+  # Creates Json for an array or a hash
+  #
+  def self.CreateStructureJson(object, tab)
+    jsonString = ""
+
+    if object.class == Hash
+      jsonString = "{\n"
+
+      object.each do |key, value|
+        jsonString = jsonString + JsonTools.Tabs(tab) + "\"" + key.to_s + "\": "
+        jsonString = jsonString + JsonWriter.CreateJson(value, tab+1)
+
+        if object.keys.last == key
+          jsonString = jsonString + "\n"
+        else
+          jsonString = jsonString + ",\n"
+        end
+      end
+      jsonString = jsonString + JsonTools.Tabs(tab-2) + "}"
+    elsif object.class == Array
+      jsonString = "[\n"
+
+      object.each_with_index do |element, index|
+        jsonString = jsonString + JsonTools.Tabs(tab)
+        jsonString = jsonString + JsonWriter.CreateJson(element, tab+1)
+
+        if index == object.length - 1
+          jsonString = jsonString + "\n"
+        else
+          jsonString = jsonString + ",\n"
+        end
+      end
+      jsonString = jsonString + JsonTools.Tabs(tab-2) + "]"
+    end
+    jsonString
+  end
+
+  #
+  # Creates Json for all the properties in the object
+  #
+  def self.CreatePropertiesJson(object, tab)
+    jsonString = ""
+    propertyList = JsonEncoder.GetPropertyList(object)
+    propertyList.each_with_index do |property, index|
+      propertyValue = object.instance_variable_get(property)
+
+      # Insert property Name
+      jsonString = jsonString + JsonTools.Tabs(tab) + "\"" + property.to_s.gsub("@", "") + "\"" + ": "
+
+      # Insert property Value
+      jsonString = jsonString + JsonWriter.CreateJson(propertyValue, tab+1)
+
+      if index == propertyList.length - 1
+        jsonString = jsonString + "\n"
+      else
+        jsonString = jsonString + ",\n"
+      end
+    end
+    jsonString
+  end
+
+  #
+  # Creates Json string for any type of object
+  #
+  def self.CreateJson(objectValue, tab)
+    $TYPE_LIST = [Symbol, String, Fixnum, Numeric, Float, Rational, Array, Hash, NilClass, TrueClass, FalseClass]
+    $DATE_TYPE = [Date, Time, DateTime]
+    objectType = objectValue.class
+
+    jsonString = ""
+
+    if !($TYPE_LIST.include? objectType) and !($DATE_TYPE.include? objectType)
+      # object is class
+      jsonString = jsonString + "{\n"
+      jsonString = jsonString + JsonWriter.CreatePropertiesJson(objectValue, tab+1) +  JsonTools.Tabs(tab-1) + "}"
+    elsif objectType == Array
+      jsonString = jsonString + JsonWriter.CreateStructureJson(objectValue, tab+1)
+    elsif objectType == Hash
+      jsonString = jsonString + JsonWriter.CreateStructureJson(objectValue, tab+1)
+    elsif objectType == String or objectType == Symbol
+      jsonString = jsonString + "\"" + JsonDecoder.JsonString(objectValue) + "\""
+    elsif objectType == TrueClass
+      jsonString = jsonString + "true"
+    elsif objectType == FalseClass
+      jsonString = jsonString + "false"
+    elsif objectType == NilClass
+      jsonString = jsonString + "null"
+    elsif $DATE_TYPE.include? objectType
+      jsonString = jsonString + JsonDate.GetJsonDate(objectValue)
+    else
+      jsonString = jsonString + objectValue.to_s
+    end
+
+    jsonString
+  end
+
+end
+
 module JsonReader
+  def self.Step(jsonString, pos)
+    pos = JsonTools.SkipBlanks(jsonString, pos)
+
+    propertyName = ""
+    propertyValue = ""
+    jsonHash = Hash.new
+
+    state = 0
+    stopFlag = false
+
+    while stopFlag == false
+
+      char = jsonString[pos]
+
+      case state
+        when 0  # Object beginning (object and hash here are similar, they will be separated later)
+          if char == "{"
+            pos = JsonTools.SkipBlanks(jsonString, pos+1)
+            state = 1
+          end
+
+        when 1 # Skipping separators
+          if char == "\""
+            out = JsonEncoder.GetPropertyName(jsonString, pos+1)
+            pos = out[0]
+            propertyName = out[1]
+            state = 1
+          elsif char == ":"
+            pos = pos + 1
+            state = 3
+          elsif char == "}"
+            pos = pos + 1
+            stopFlag = true
+          end
+
+          pos = JsonTools.SkipBlanks(jsonString, pos)
+
+        when 3 # Defining the type of propertyValue
+          if char == "{"
+            out = Step(jsonString, pos)
+          elsif char == "["
+            out = JsonEncoder.GetArray(jsonString, pos+1)
+          else
+            out = JsonEncoder.GetElem(jsonString, pos)
+          end
+
+          pos = out[0]
+          propertyValue = out[1]
+          state = 6
+          pos = JsonTools.SkipBlanks(jsonString, pos)
+
+        when 6 # Iteration
+          if char == "," or char == "}"
+            if propertyName != "" and propertyValue != ""
+              jsonHash[propertyName] = propertyValue
+              propertyName = ""
+              propertyValue = ""
+            end
+          end
+
+          if char == ","
+            pos = JsonTools.SkipBlanks(jsonString, pos+1)
+            state = 1
+          end
+
+          if char == "}"
+            stopFlag = true
+          end
+
+      end
+
+    end
+    out[0] = pos + 1
+    out[1] = jsonHash
+    out
+  end
+
+  #
+  # Fills object with values
+  #
+  def self.FeedObject(jsonHash, object)
+    #object = Serializable.new
+    jsonHash.each do |key, value|
+      objectValue = {key => JsonEncoder.GetVariable(value)}
+      object.add_attrs(objectValue)
+    end
+    object
+  end
+
+  #
+  # Fills hash with values
+  #
+  def self.FeedHash(jsonHash)
+    hash = Hash.new
+    jsonHash.each do |key, value|
+      objectValue = JsonEncoder.GetVariable(value)
+      hash[key] = objectValue
+    end
+    hash
+  end
+
+  #
+  # Fills an array with values
+  #
+  def self.FeedArray(jsonArray)
+    array = Array.new
+    jsonArray.each do |value|
+      objectValue = JsonEncoder.GetVariable(value)
+      array.push(objectValue)
+    end
+    array
+  end
+
+  #
+  # Creates an object of the specified class OR hash
+  #
+  def self.CreateObject(jsonHash)
+    if jsonHash.has_key? "__class"
+      # That's object
+      className = jsonHash["__class"]
+
+      begin
+        classObj = Object.const_get className
+        object = classObj.new
+
+        rescue Exception => msg
+          puts msg
+      end
+      object = JsonReader.FeedObject(jsonHash, object)
+    else
+      # That's hash
+      object = JsonReader.FeedHash(jsonHash)
+    end
+
+    object
+  end
+
+  #
+  # Wrap method to get hash from jsonString
+  #
+  def self.GetHashFromJson(jsonString)
+    JsonReader.Step(jsonString, 0)[1]
+  end
+
+end
+
+module JsonEncoder
   #
   # Returns array of all properties of targeted object
   #
@@ -61,13 +308,13 @@ module JsonReader
 
     while char != "]"
       if char == "{"
-        outArray = JsonEncoder.Step(jsonString, pos)
+        outArray = JsonReader.Step(jsonString, pos)
         pos = outArray[0]
         arrayElem = outArray[1]
         pos = JsonTools.SkipBlanks(jsonString, pos)
       elsif char == "["
         pos = JsonTools.SkipBlanks(jsonString, pos+1)
-        outArray = JsonReader.GetArray(jsonString, pos)
+        outArray = JsonEncoder.GetArray(jsonString, pos)
         pos = outArray[0]
         arrayElem = outArray[1]
       elsif char == ","
@@ -75,7 +322,7 @@ module JsonReader
         arrayElem = ""
         pos = JsonTools.SkipBlanks(jsonString, pos+1)
       else
-        out = JsonReader.GetElem(jsonString, pos)
+        out = JsonEncoder.GetElem(jsonString, pos)
         pos = out[0]
         arrayElem = out[1]
       end
@@ -107,9 +354,9 @@ module JsonReader
     if value.class == String
       objectValue = JsonDecoder.DecodeValue(value)
     elsif value.class == Array
-      objectValue = JsonEncoder.FeedArray(value)
+      objectValue = JsonReader.FeedArray(value)
     elsif value.class == Hash
-      objectValue = RubyJson.CreateObject(value)
+      objectValue = JsonReader.CreateObject(value)
     end
     objectValue
   end
@@ -120,189 +367,6 @@ module JsonReader
   def self.GetMethodList(object)
     (object.public_methods - Object.public_methods).sort
   end
-end
-
-module JsonEncoder
-  #
-  # Creates Json for an array or a hash
-  #
-  def self.CreateStructureJson(object, tab)
-    jsonString = ""
-
-    if object.class == Hash
-      jsonString = "{\n"
-
-      object.each do |key, value|
-        jsonString = jsonString + JsonTools.Tabs(tab) + "\"" + key.to_s + "\": "
-        jsonString = jsonString + RubyJson.CreateJson(value, tab+1)
-
-        if object.keys.last == key
-          jsonString = jsonString + "\n"
-        else
-          jsonString = jsonString + ",\n"
-        end
-      end
-
-      jsonString = jsonString + JsonTools.Tabs(tab-2) + "}"
-
-    elsif object.class == Array
-      jsonString = "[\n"
-
-      object.each_with_index do |element, index|
-        jsonString = jsonString + JsonTools.Tabs(tab)
-        jsonString = jsonString + RubyJson.CreateJson(element, tab+1)
-
-        if index == object.length - 1
-          jsonString = jsonString + "\n"
-        else
-          jsonString = jsonString + ",\n"
-        end
-      end
-      jsonString = jsonString + JsonTools.Tabs(tab-2) + "]"
-
-    end
-
-    jsonString
-  end
-
-  #
-  # Creates Json for all the properties in the object
-  #
-  def self.CreatePropertiesJson(object, tab)
-    jsonString = ""
-    propertyList = JsonReader.GetPropertyList(object)
-    propertyList.each_with_index do |property, index|
-      propertyValue = object.instance_variable_get(property)
-
-      # Insert property Name
-      jsonString = jsonString + JsonTools.Tabs(tab) + "\"" + property.to_s.gsub("@", "") + "\"" + ": "
-
-      # Insert property Value
-      jsonString = jsonString + RubyJson.CreateJson(propertyValue, tab+1)
-
-      if index == propertyList.length - 1
-        jsonString = jsonString + "\n"
-      else
-        jsonString = jsonString + ",\n"
-      end
-    end
-    jsonString
-  end
-
-  def self.Step(jsonString, pos)
-    pos = JsonTools.SkipBlanks(jsonString, pos)
-
-    propertyName = ""
-    propertyValue = ""
-    jsonHash = Hash.new
-
-    state = 0
-    stopFlag = false
-
-    while stopFlag == false
-
-      char = jsonString[pos]
-
-      case state
-        when 0  # Object beginning (object and hash here are similar, they will be separated later)
-          if char == "{"
-            pos = JsonTools.SkipBlanks(jsonString, pos+1)
-            state = 1
-          end
-
-        when 1 # Skipping separators
-          if char == "\""
-            out = JsonReader.GetPropertyName(jsonString, pos+1)
-            pos = out[0]
-            propertyName = out[1]
-            state = 1
-          elsif char == ":"
-            pos = pos + 1
-            state = 3
-          elsif char == "}"
-            pos = pos + 1
-            stopFlag = true
-          end
-
-          pos = JsonTools.SkipBlanks(jsonString, pos)
-
-        when 3 # Defining the type of propertyValue
-          if char == "{"
-            out = Step(jsonString, pos)
-          elsif char == "["
-            out = JsonReader.GetArray(jsonString, pos+1)
-          else
-            out = JsonReader.GetElem(jsonString, pos)
-          end
-
-          pos = out[0]
-          propertyValue = out[1]
-          state = 6
-          pos = JsonTools.SkipBlanks(jsonString, pos)
-
-        when 6 # Iteration
-          if char == "," or char == "}"
-            if propertyName != "" and propertyValue != ""
-              jsonHash[propertyName] = propertyValue
-              propertyName = ""
-              propertyValue = ""
-            end
-          end
-
-          if char == ","
-            pos = JsonTools.SkipBlanks(jsonString, pos+1)
-            state = 1
-          end
-
-          if char == "}"
-            stopFlag = true
-          end
-
-      end
-
-    end
-    out[0] = pos + 1
-    out[1] = jsonHash
-    out
-  end
-
-  #
-  # Fills object with values
-  #
-  def self.FeedObject(jsonHash, object)
-    #object = Serializable.new
-    jsonHash.each do |key, value|
-      #objectValue = GetVariable(value)
-      #object.instance_variable_set("@"+key, objectValue)
-      objectValue = {key => JsonReader.GetVariable(value)}
-      object.add_attrs(objectValue)
-    end
-    object
-  end
-
-    #
-    # Fills hash with values
-    #
-    def self.FeedHash(jsonHash)
-      hash = Hash.new
-      jsonHash.each do |key, value|
-        objectValue = JsonReader.GetVariable(value)
-        hash[key] = objectValue
-      end
-      hash
-    end
-
-    #
-    # Fills an array with values
-    #
-    def self.FeedArray(jsonArray)
-      array = Array.new
-      jsonArray.each do |value|
-        objectValue = JsonReader.GetVariable(value)
-        array.push(objectValue)
-      end
-      array
-    end
 end
 
 module JsonDecoder
