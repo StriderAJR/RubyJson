@@ -1,5 +1,5 @@
-RubyJson
-========
+#RubyJson
+
 RubyJson is a simple JSON serializer for Ruby.
 
 I've got the idea of making my own JSON serializer because I needed to store objects in IronRuby. But I found out that
