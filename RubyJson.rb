@@ -51,6 +51,12 @@ module Json
       JsonReader.CreateObject(jsonHash)
     end
 
+    #
+    # If don't know have the class name in json string or
+    # you don't have module with definition for it,
+    # use this method. It will correctly deserialize object,
+    # but all class types will be "Json::Serializable"
+    #
     def self.DeserializeWithNoRestrictions(jsonString)
       jsonHash = JsonReader.GetHashFromJson(jsonString)
 
