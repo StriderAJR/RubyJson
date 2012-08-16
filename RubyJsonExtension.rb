@@ -1,7 +1,10 @@
 require './RubyJson.rb'
+require './JsonDate'
 require 'date'
 require 'time'
 require 'securerandom'
+
+include JsonDate
 
 module JsonWriter
   #
@@ -184,7 +187,7 @@ module JsonReader
   #
   # Fills object with values
   #
-  def self.FeedObject(jsonHash, object)
+  def self.FeedObject(jsonHash, object, restriction = true)
     #object = Serializable.new
     jsonHash.each do |key, value|
       objectValue = {key => JsonEncoder.GetVariable(value)}
@@ -196,10 +199,10 @@ module JsonReader
   #
   # Fills hash with values
   #
-  def self.FeedHash(jsonHash)
+  def self.FeedHash(jsonHash, restriction = true)
     hash = Hash.new
     jsonHash.each do |key, value|
-      objectValue = JsonEncoder.GetVariable(value)
+      objectValue = JsonEncoder.GetVariable(value, restriction)
       hash[key] = objectValue
     end
     hash
@@ -208,10 +211,10 @@ module JsonReader
   #
   # Fills an array with values
   #
-  def self.FeedArray(jsonArray)
+  def self.FeedArray(jsonArray, restriction = true)
     array = Array.new
     jsonArray.each do |value|
-      objectValue = JsonEncoder.GetVariable(value)
+      objectValue = JsonEncoder.GetVariable(value, restriction)
       array.push(objectValue)
     end
     array
@@ -220,22 +223,29 @@ module JsonReader
   #
   # Creates an object of the specified class OR hash
   #
-  def self.CreateObject(jsonHash)
-    if jsonHash.has_key? "__class"
+  # restriction = true - classic deserialization, false - you don't need
+  # to know class name. All the classes will be from Serializable
+  def self.CreateObject(jsonHash, restriction = true)
+    if jsonHash.has_key? "__class" or jsonHash.has_key? "__id"
       # That's object
       className = jsonHash["__class"]
 
       begin
-        classObj = Object.const_get className
-        object = classObj.new
+        #classObj = Object.const_get className
+        if restriction
+          classObj = JsonTools.GetClass(className)
+          object = classObj.new
+        else
+          object = Serializable.new
+        end
 
         rescue Exception => msg
           puts msg
       end
-      object = JsonReader.FeedObject(jsonHash, object)
+      object = JsonReader.FeedObject(jsonHash, object, restriction)
     else
       # That's hash
-      object = JsonReader.FeedHash(jsonHash)
+      object = JsonReader.FeedHash(jsonHash, restriction)
     end
 
     object
@@ -350,13 +360,13 @@ module JsonEncoder
   #
   # Returns variable of needed type
   #
-  def self.GetVariable(value)
+  def self.GetVariable(value, restriction = true)
     if value.class == String
       objectValue = JsonDecoder.DecodeValue(value)
     elsif value.class == Array
-      objectValue = JsonReader.FeedArray(value)
+      objectValue = JsonReader.FeedArray(value, restriction)
     elsif value.class == Hash
-      objectValue = JsonReader.CreateObject(value)
+      objectValue = JsonReader.CreateObject(value, restriction)
     end
     objectValue
   end
@@ -469,6 +479,15 @@ module JsonDecoder
 end
 
 module JsonTools
+  #
+  # Finds class type in assemblies from its full class name
+  #
+  def GetClass(fullClassName)
+    fullClassName.split('::').inject(Object) do |mod, className|
+      mod.const_get(className)
+    end
+  end
+
   #
   # Sets several tabs for a better look
   #

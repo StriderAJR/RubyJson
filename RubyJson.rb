@@ -9,13 +9,12 @@
 
 
 module Json
-  require 'date'
-  require 'time'
-  require './JsonDate'
   require './RubyJsonExtension'
 
   include JsonWriter
+  include JsonReader
   include JsonDecoder
+  include JsonEncoder
   include JsonTools
 
 
@@ -51,6 +50,12 @@ module Json
 
       JsonReader.CreateObject(jsonHash)
     end
+
+    def self.DeserializeWithNoRestrictions(jsonString)
+      jsonHash = JsonReader.GetHashFromJson(jsonString)
+
+      JsonReader.CreateObject(jsonHash, false)
+    end
   end
 
   #############################################
@@ -79,96 +84,6 @@ module Json
 
     def GetRubyObject
       $object
-    end
-
-    def PrintRubyObject
-      puts $object.Id
-      puts $object.Id.class
-      puts
-
-      puts $object.val1
-      puts $object.val1.class
-      puts
-
-      puts $object.val2
-      puts $object.val2.class
-      puts
-
-      puts $object.name
-      puts $object.name.class
-      puts
-
-      puts $object.classVar.test1
-      puts $object.classVar.test1.class
-      puts
-
-      puts $object.classVar.test2
-      puts $object.classVar.test2.class
-      puts
-
-      puts $object.classVar.classVar2
-      puts $object.classVar.classVar2.class
-      puts
-
-      puts $object.classVar.classVar2.val
-      puts $object.classVar.classVar2.val.class
-      puts
-
-      puts $object.classVar.classVar2.timeVal
-      puts $object.classVar.classVar2.timeVal.class
-      puts
-
-      puts $object.classVar.classVar2.dateVal
-      puts $object.classVar.classVar2.dateVal.class
-      puts
-
-      puts $object.classVar.classVar2.datetimeVal
-      puts $object.classVar.classVar2.datetimeVal.class
-      puts
-
-      puts $object.pro
-      puts $object.pro.class
-      puts
-
-      puts $object.trueVal
-      puts $object.trueVal.class
-      puts
-
-      puts $object.falseVal
-      puts $object.falseVal.class
-      puts
-
-      puts $object.nilVal
-      puts $object.nilVal.class
-      puts
-
-      puts $object.anotherClass.arrHash
-      puts $object.anotherClass.arrHash.class
-      puts
-
-      puts $object.anotherClass.arrArr
-      puts $object.anotherClass.arrArr.class
-      puts
-
-      puts $object.anotherClass.arrObj
-      puts $object.anotherClass.arrObj.class
-      puts
-
-      puts $object.anotherClass.hash
-      puts $object.anotherClass.hash.class
-      puts
-
-      puts $object.anotherClass.hashArr
-      puts $object.anotherClass.hashArr.class
-      puts
-
-      puts $object.anotherClass.hashHash
-      puts $object.anotherClass.hashHash.class
-      puts
-
-      puts $object.anotherClass.hashObj
-      puts $object.anotherClass.hashObj.class
-      puts
     end
   end
 

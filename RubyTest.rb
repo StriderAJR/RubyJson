@@ -112,3 +112,40 @@ $jsonString = RubyJson.Serialize(test)
 puts $jsonString
 $object = RubyJson.Deserialize($jsonString)
 
+object = tracer.Deserialize($jsonString)
+puts object.val2
+puts
+
+module B
+  class ClassB < Serializable
+    attr_accessor :val1
+  end
+end
+
+module A
+  class ClassA < Serializable
+    attr_accessor :val1, :val2
+  end
+end
+
+classA = A::ClassA.new
+classB = B::ClassB.new
+classB.val1 = "I'm Class from module B"
+classA.val1 = "I'm Class from module A"
+classA.val2 = classB
+
+jsonString = RubyJson.Serialize(classA)
+puts jsonString
+puts
+
+object = RubyJson.Deserialize(jsonString)
+puts object.class
+puts object.val1
+puts object.val2.val1
+puts
+
+
+object = RubyJson.DeserializeWithNoRestrictions(jsonString)
+puts object.class
+puts object.val1
+puts
