@@ -7,6 +7,7 @@
 #                       July 2012                      #
 ########################################################
 
+# TODO struct, proc, lambda support
 
 module Json
   require './RubyJsonExtension'
