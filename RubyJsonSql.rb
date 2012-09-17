@@ -157,6 +157,10 @@ module JsonSql
       @visitor = Visitor.new(objList)
     end
 
+    def method_missing(methName, arg, &block)
+      methods[methName] = arg
+    end
+
     def Run()
       @expressionTree = "{\n"
 
@@ -164,6 +168,10 @@ module JsonSql
       @expressionTree += PrintMethod(@methods, keys, 1)
 
       @expressionTree += "}"
+    end
+
+    def Finalize
+      Run
     end
 
     def PrintMethod(methods, keys, tab = 0)
