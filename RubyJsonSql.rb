@@ -2,115 +2,15 @@ require './JsonTools'
 
 include JsonTools
 
-module QuerySchema
-  # Json node schema:
-
-  JsonNodeType = "NodeType"
-
-  JsonNodeMethod = "Method"
-  JsonNodeBinaryOperation = "BinaryOp"
-  JsonNodeUnaryOperation = "UnaryOp"
-  JsonNodeProperty = "Property"
-  JsonNodeConstant = "Constant"
-
-  JsonMethodName = "Name"
-  JsonMethodArguments = "Arguments"
-
-  JsonBinaryOperation = "Operation"
-  JsonBinaryOperationLeft = "Left"
-  JsonBinaryOperationRight = "Right"
-
-  JsonUnaryOperation = "Operation"
-  JsonUnaryOperationOperand = "Operand"
-
-  JsonPropertyName = "Name"
-
-  JsonConstantValue = "Value"
-
-  # Query methods:
-
-  MethodSelect = "Select"
-  MethodFirst = "First"
-  MethodCount = "Count"
-  MethodWhere = "Where"
-  MethodOrderBy = "OrderBy"
-  MethodOrderByDesc = "OrderByDesc"
-  MethodSkip = "Skip"
-  MethodTake = "Take"
-
-  MethodsList = Array.new
-  MethodsList.push(MethodSelect, MethodFirst, MethodCount, MethodOrderBy, MethodOrderByDesc)
-  MethodsList.push(MethodSkip, MethodsList, MethodTake, MethodWhere)
-
-  # Binary logic operations:
-
-  BinaryOperationContains = "IN"
-  BinaryOperationAndAlso = "AND"
-  BinaryOperationOrElse = "OR"
-  BinaryOperationEqual = "="
-  BinaryOperationNotEqual = "<>"
-  BinaryOperationLessThan = "<"
-  BinaryOperationLessThanOrEqual = "<="
-  BinaryOperationGreaterThan = ">"
-  BinaryOperationGreaterThanOrEqual = ">="
-
-  # Unary logic operations:
-
-  UnaryOperationNot = "NOT"
-
-  # .Net Types
-
-  NetTypes = Hash.new
-  NetTypes["Guid"] = "System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["String"] = "System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["Char"] = "System.Char, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["Boolean"] = "System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["DateTime"] = "System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["TimeSpan"] = "System.TimeSpan, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["Int16"] = "System.Int16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["Int32"] = "System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["UInt16"] = "System.UInt16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["UInt32"] = "System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["Int64"] = "System.Int64, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["UInt64"] = "System.UInt64, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["Single"] = "System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["Double"] = "System.Double, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["Decimal"] = "System.Decimal, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-  NetTypes["Object"] = "System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-end
-
 module JsonSql
-  include QuerySchema
-
-  def BuildExpressionTree(queryString)
-    if queryString == "" or nil
-      raise "Empty or Null string parameter"
-    end
-
-    pos = 0
-    loop do
-      output = JsonSqlDecoder.GetMemberName(queryString, pos)
-      memberName = output[1]
-      break if MethodsList.include? memberName
-      pos = output[0] + 1
-    end
-
-    pos = JsonTools.SkipBlanks(queryString, pos)
-    queryString = queryString[pos.. -1]
-
-    #visitor = Visitor.new
-    #visitor.expressionArray = []
-    JsonSqlDecoder.Decode(queryString, visitor.expressionArray, 0)
-  end
-end
-
-module JsonSql
-
+  #
+  # Use this class as object template
+  #
   class Visitor
-    attr_accessor :objList, :name
+    attr_accessor :objType, :name
 
     def initialize(objList)
-      @objList = objList
+      @objType = objList
     end
 
     def as(name)
@@ -127,7 +27,7 @@ module JsonSql
       propertyName = methName.to_s
       propertyName += "("
       begin
-        fullClassName = GetClassName(@objList[0].instance_variable_get("@" + methName.to_s).class.to_s)
+        fullClassName = GetClassName(@objType.instance_variable_get("@" + methName.to_s).class.to_s)
         if fullClassName.first == "System" and QuerySchema.NetTypes.include? fullClassName.last
           propertyName += NetTypes[fullClassName.last]
         else
@@ -145,6 +45,9 @@ module JsonSql
     end
   end
 
+  #
+  # Access class to build JsonSql
+  #
   class Runner
     attr_accessor :expressionTree, :visitor, :methods
 
@@ -153,14 +56,24 @@ module JsonSql
       @methods = Hash.new
     end
 
-    def take(objList)
-      @visitor = Visitor.new(objList)
+    #
+    # Get object template to create visitor
+    #
+    def take(objType)
+      @visitor = Visitor.new(objType)
     end
 
+    #
+    # Call Where, Select, OrderBy, etc.
+    #
     def method_missing(methName, arg, &block)
       methods[methName] = arg
+      "Ok!"
     end
 
+    #
+    # Build JsonSql
+    #
     def Run()
       @expressionTree = "{\n"
 
@@ -170,15 +83,11 @@ module JsonSql
       @expressionTree += "}"
     end
 
-    def Finalize
-      Run
-    end
-
     def PrintMethod(methods, keys, tab = 0)
       expressionTree = ""
       keys.each do |key|
         expressionTree += JsonTools.Tabs(tab) + "\"NodeType\" : \"Method\",\n"
-        expressionTree += JsonTools.Tabs(tab) + "\"Name\" : \"" + key + "\",\n"
+        expressionTree += JsonTools.Tabs(tab) + "\"Name\" : \"" + key.to_s + "\",\n"
         expressionTree += JsonTools.Tabs(tab) + "\"Arguments\" : [\n"
         if keys.length > 1
           keys.delete(key)
