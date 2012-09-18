@@ -2,6 +2,7 @@ require "./RubyJsonSql"
 require "./Linq"
 
 include JsonSql
+include Linq
 
 class A
   attr_accessor :val1, :val2
@@ -20,12 +21,6 @@ a.val2 = 100500
 runner = Runner.new
 p = runner.take(a)
 p.as "p"
-
-#runner.methods["Where"] = BinaryOp.And(1,BinaryOp.Equal(5, runner.visitor.val1))
-#runner.methods["Select"] = UnaryOp.Not(4)
-
-
-include Linq
 
 array = [1,2,3]
 hash = {"a" => 1, "b"=>4}

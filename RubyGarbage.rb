@@ -551,3 +551,43 @@
 
 # Input all Ruby types
 #puts "13".class, 12.class, [1,2].class, {"a" => 1}.class, nil.class
+
+#######################################
+# Old RubyLinq sintax
+#######################################
+
+#runner = Runner.new
+#p = runner.take(a)
+#p.as "p"
+
+#runner.methods["Where"] = BinaryOp.And(1,BinaryOp.Equal(5, runner.visitor.val1))
+#runner.methods["Select"] = UnaryOp.Not(4)
+
+#puts runner.Run
+
+#######################################
+# New RubyLinq sintax
+#######################################
+
+#runner = Runner.new
+#p = runner.take(a)
+#p.as "p"
+
+#runner.Where(p.val1.Equal 0)
+#runner.OrderBy(p.val2)
+#runner.Select(10.Less 12)
+#puts runner.Run
+
+##########################################################
+# That's how you can call property and method in one way
+##########################################################
+
+#puts b.send("hour")
+
+########################################
+# Converting Ruby types into .Net types
+########################################
+
+#c = 3
+#cn = c.class.to_clr_type
+#puts cn
