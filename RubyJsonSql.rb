@@ -9,13 +9,38 @@ module JsonSql
   class Visitor
     attr_accessor :objType, :name
 
-    def initialize(objList)
-      @objType = objList
+    def initialize(obj)
+      @objType = obj
     end
 
     def as(name)
       @name = name
       self
+    end
+
+    def NetTypes(typeName)
+      netTypes = Hash.new
+      netTypes["Guid"] = "System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["String"] = "System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["Char"] = "System.Char, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["Boolean"] = "System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["DateTime"] = "System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["TimeSpan"] = "System.TimeSpan, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["Int16"] = "System.Int16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["Int32"] = "System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+
+      netTypes["Fixnum"] = "System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+
+      netTypes["UInt16"] = "System.UInt16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["UInt32"] = "System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["Int64"] = "System.Int64, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["UInt64"] = "System.UInt64, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["Single"] = "System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["Double"] = "System.Double, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["Decimal"] = "System.Decimal, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      netTypes["Object"] = "System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+
+      netTypes[typeName]
     end
 
     def method_missing(methName, *args, &block)
@@ -27,15 +52,29 @@ module JsonSql
       propertyName = methName.to_s
       propertyName += "("
       begin
-        fullClassName = GetClassName(@objType.instance_variable_get("@" + methName.to_s).class.to_s)
-        if fullClassName.first == "System" and QuerySchema.NetTypes.include? fullClassName.last
-          propertyName += NetTypes[fullClassName.last]
-        else
-          propertyName += NetFullClassName(fullClassName)
-        end
+        #fullClassName = GetClassNameArray(@objType.instance_variable_get("@" + methName.to_s).class.to_s)
+        #fullClassName = GetClassNameArray(objType.send(methName).class.to_s)
+
+        #if @objType.RubyObject?
+        #  fullClassName = GetClassNameArray(@objType.send(methName).class.to_s)
+        #  propertyName += NetFullClassName fullClassName
+        #else
+        #  fullClassName = GetClassNameArray(@objType.send(methName).class.to_clr_type.to_s)
+        #
+        #  errorMessage = "Oops! You are trying to invoke " + methName + " method of your visitor."
+        #  errorMessage += "And you thought it's .Net object. But it's not. \n"
+        #  errorMessage += "I couldn't find " + fullClassName.last + " in the .Net types list. Sorry."
+        #  raise errorMessage if NetTypes fullClassName.last == nil
+        #  propertyName += NetTypes fullClassName.last
+        #end
+
+        fullClassName = GetClassNameArray(@objType.send(methName).class.to_s)
+        raise errorMessage if NetTypes fullClassName.last == nil
+        propertyName += NetTypes fullClassName.last
+
       rescue Exception => msg
         puts msg
-        puts "No property with name " + methName.to_s
+        #puts "No property with name " + methName.to_s
       end
       propertyName += ")"
 

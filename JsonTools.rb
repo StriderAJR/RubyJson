@@ -8,7 +8,7 @@ module JsonTools
     end
   end
 
-  def GetClassName(fullClassName)
+  def GetClassNameArray(fullClassName)
     fullClassName.split('::')
   end
 
@@ -18,6 +18,17 @@ module JsonTools
       className += member + "."
     end
     className[0..-2]
+  end
+
+  def RubyObject?
+    netModules = ["System", "Univeris"]
+    classNameArray = GetClassNameArray(self.class.to_s)
+
+    if netModules.include? classNameArray[0]
+      false
+    else
+      true
+    end
   end
 
   #
