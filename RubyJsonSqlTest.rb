@@ -8,12 +8,6 @@ class A
   attr_accessor :val1, :val2
 end
 
-
-#array = [A]
-#visitor = Visitor.new(array)
-#visitor.as "p"
-#puts visitor.val1
-
 a = A.new
 a.val1 = "Hello!"
 a.val2 = 100500
