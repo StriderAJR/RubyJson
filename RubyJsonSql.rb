@@ -52,22 +52,6 @@ module JsonSql
       propertyName = methName.to_s
       propertyName += "("
       begin
-        #fullClassName = GetClassNameArray(@objType.instance_variable_get("@" + methName.to_s).class.to_s)
-        #fullClassName = GetClassNameArray(objType.send(methName).class.to_s)
-
-        #if @objType.RubyObject?
-        #  fullClassName = GetClassNameArray(@objType.send(methName).class.to_s)
-        #  propertyName += NetFullClassName fullClassName
-        #else
-        #  fullClassName = GetClassNameArray(@objType.send(methName).class.to_clr_type.to_s)
-        #
-        #  errorMessage = "Oops! You are trying to invoke " + methName + " method of your visitor."
-        #  errorMessage += "And you thought it's .Net object. But it's not. \n"
-        #  errorMessage += "I couldn't find " + fullClassName.last + " in the .Net types list. Sorry."
-        #  raise errorMessage if NetTypes fullClassName.last == nil
-        #  propertyName += NetTypes fullClassName.last
-        #end
-
         fullClassName = GetClassNameArray(@objType.send(methName).class.to_s)
         raise errorMessage if NetTypes fullClassName.last == nil
         propertyName += NetTypes fullClassName.last
@@ -107,7 +91,7 @@ module JsonSql
     #
     def method_missing(methName, arg, &block)
       methods[methName] = arg
-      "Ok!"
+      self
     end
 
     #

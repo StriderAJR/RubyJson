@@ -1,5 +1,4 @@
 $: << 'D:/Programs/Univeris/Univeris.DLL'
-#print $:
 
 include System
 
@@ -27,9 +26,7 @@ p.as "p"
 #array = [1,2,3]
 #hash = {"a" => 1, "b"=>4}
 
-runner.Where(p.val1.Equal 0)
-runner.OrderBy(p.val2)
-runner.Select(10.Less 12)
+runner.Where(p.val1.Equal 0).OrderBy(p.val2).Select(10.Less 12)
 puts runner.Run
 
 
