@@ -13,10 +13,10 @@ module JsonSql
       @objType = obj
     end
 
-    def as(name)
-      @name = name
-      self
-    end
+    #def as(name)
+    #  @name = name
+    #  self
+    #end
 
     def NetTypes(typeName)
       netTypes = Hash.new
@@ -82,8 +82,10 @@ module JsonSql
     #
     # Get object template to create visitor
     #
-    def take(objType)
+    def take_as(objType, name)
       @visitor = Visitor.new(objType)
+      @visitor.name = name
+      @visitor
     end
 
     #

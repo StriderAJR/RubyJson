@@ -68,30 +68,30 @@ module Json
   #############################################
   # RubyJson mapper for IronRuby calls
   #############################################
-  class RubyProvider
-    def GetHash
-      $hashString
-    end
-
-    def GetJson
-      $jsonString
-    end
-
-    def Serialize(object)
-      $jsonString = RubyJson.Serialize(object)
-    end
-
-    def Deserialize(json)
-      $object = RubyJson.Deserialize(json)
-    end
-
-    def GetClassName
-      $className
-    end
-
-    def GetRubyObject
-      $object
-    end
-  end
+  #class RubyProvider
+  #  def GetHash
+  #    $hashString
+  #  end
+  #
+  #  def GetJson
+  #    $jsonString
+  #  end
+  #
+  #  def Serialize(object)
+  #    $jsonString = RubyJson.Serialize(object)
+  #  end
+  #
+  #  def Deserialize(json)
+  #    $object = RubyJson.Deserialize(json)
+  #  end
+  #
+  #  def GetClassName
+  #    $className
+  #  end
+  #
+  #  def GetRubyObject
+  #    $object
+  #  end
+  #end
 
 end
